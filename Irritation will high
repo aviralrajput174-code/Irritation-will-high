@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#080714">
+<title>RAGE ROUTINE - DEVIL MODE</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ background:#080714;
+ color:white;
+ font-family:Arial,sans-serif;
+ overflow:hidden;
+}
+button{
+ border:2px solid #00eaff;
+ background:linear-gradient(135deg,#171747,#30104b);
+ color:white;
+ font-weight:900;
+ border-radius:12px;
+ padding:12px 22px;
+ cursor:pointer;
+ touch-action:none;
+}
+button:active{transform:scale(.94)}
+#rotate{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:99;
+ background:#080714;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ font-size:25px;
+ font-weight:1000;
+}
+#app{
+ height:100dvh;
+ display:flex;
+ flex-direction:column;
+ padding:10px;
+ gap:8px;
+ max-width:1200px;
+ margin:auto;
+}
+header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:8px;
+}
+.logo{
+ font-size:clamp(18px,4vw,30px);
+ font-weight:1000;
+ color:#ff168e;
+ font-style:italic;
+ text-shadow:3px 3px #4b002e,0 0 15px #ff168e;
+}
+.logo small{
+ display:block;
+ color:#ffd52a;
+ font-size:10px;
+ letter-spacing:4px;
+}
+.stats{display:flex;gap:5px}
+.stat{
+ background:#17132f;
+ border:1px solid #823dff;
+ padding:6px;
+ border-radius:8px;
+ font-size:10px;
+ text-align:center;
+ min-width:50px;
+}
+.stat b{
+ display:block;
+ color:#00eaff;
+ font-size:16px;
+}
+#menu{
+ flex:1;
+ display:grid;
+ place-items:center;
+ text-align:center;
+ overflow:auto;
+}
+.panel{
+ width:min(700px,100%);
+ padding:25px 12px;
+ background:linear-gradient(145deg,#21113e,#09091c);
+ border:1px solid #ff168e;
+ border-radius:20px;
+ box-shadow:0 0 30px #ff168e44;
+}
+.hero{
+ font-size:clamp(45px,10vw,80px);
+ font-weight:1000;
+ line-height:.9;
+ color:#ff168e;
+ font-style:italic;
+ text-shadow:4px 4px #52002e,0 0 20px #ff168e;
+}
+.sub{
+ color:#ffd52a;
+ letter-spacing:5px;
+ font-weight:bold;
+ margin:15px;
+}
+.tag{
+ color:#aab9ed;
+ font-size:12px;
+ margin:12px;
+ line-height:1.6;
+}
+#play{
+ font-size:23px;
+ padding:15px 55px;
+ background:linear-gradient(90deg,#ff168e,#7733ff);
+ border-color:#ff8bd0;
+ margin:15px;
+}
+#game{
+ display:none;
+ flex:1;
+ min-height:0;
+ position:relative;
+ border:1px solid #8b35ff;
+ border-radius:14px;
+ overflow:hidden;
+ background:#090a24;
+}
+canvas{
+ width:100%;
+ height:100%;
+ display:block;
+ touch-action:none;
+}
+.hud{
+ position:absolute;
+ top:8px;
+ left:8px;
+ right:8px;
+ display:flex;
+ justify-content:space-between;
+ gap:6px;
+ font-size:12px;
+ font-weight:bold;
+ pointer-events:none;
+}
+.hud span{
+ background:#08091ddd;
+ border:1px solid #6944c5;
+ padding:7px;
+ border-radius:7px;
+}
+.controls{
+ position:absolute;
+ bottom:10px;
+ left:10px;
+ right:10px;
+ display:flex;
+ justify-content:space-between;
+ pointer-events:none;
+}
+.pad{display:flex;gap:9px}
+.ctrl{
+ pointer-events:auto;
+ width:58px;
+ height:58px;
+ border-radius:50%;
+ padding:0;
+ font-size:22px;
+ background:#071c45dd;
+}
+.jump{
+ border-color:#ff168e;
+ width:72px;
+ height:72px;
+}
+#toast{
+ display:none;
+ position:absolute;
+ inset:0;
+ background:#050513e8;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:15px;
+}
+.box{
+ background:#17132f;
+ border:1px solid #ff168e;
+ border-radius:15px;
+ padding:25px;
+ width:min(420px,95%);
+ box-shadow:0 0 30px #ff168e55;
+}
+.box h2{
+ color:#ff168e;
+ font-size:30px;
+ margin-bottom:10px;
+}
+#levelSelect{
+ display:none;
+ position:absolute;
+ inset:0;
+ background:#080714f5;
+ z-index:5;
+ padding:20px;
+ overflow:auto;
+}
+.levelGrid{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(55px,1fr));
+ gap:8px;
+ margin-top:20px;
+}
+.levelGrid button{
+ padding:12px 3px;
+}
+.levelGrid button:disabled{
+ opacity:.3;
+}
+@media(orientation:portrait) and (max-width:900px){
+ #rotate{display:flex}
+ #app{visibility:hidden}
+}
+@media(max-height:430px){
+ #app{padding:4px;gap:4px}
+ .logo{font-size:18px}
+ .ctrl{width:48px;height:48px}
+ .jump{width:60px;height:60px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="rotate">
+ <div>
+  ⟳<br>
+  ROTATE YOUR PHONE<br>
+  <small style="font-size:13px;color:#aaa">
+   LANDSCAPE MODE REQUIRED
+  </small>
+ </div>
+</div>
+
+<div id="app">
+
+<header>
+ <div class="logo">
+  RAGE ROUTINE
+  <small>DEVIL MODE • 0.1% CLUB</small>
+ </div>
+
+ <div class="stats">
+  <div class="stat">LEVEL<b id="levelTop">1/100</b></div>
+  <div class="stat">BEST<b id="bestTop">1</b></div>
+  <div class="stat">DEATHS<b id="deathsTop">0</b></div>
+ </div>
+</header>
+
+<section id="menu">
+ <div class="panel">
+  <div class="hero">RAGE<br>ROUTINE</div>
+  <div class="sub">⚡ DEVIL MODE ⚡</div>
+
+  <h3>100 LEVELS. ZERO MERCY.</h3>
+
+  <p class="tag">
+   FAKE FLOORS • MOVING TRAPS<br>
+   EVIL TIMING • DEVIL BOSSES
+  </p>
+
+  <button id="play">▶ PLAY GAME</button>
+  <br>
+  <button id="levelsButton">SELECT LEVEL</button>
+  <br>
+  <button id="reset">RESET SAVE</button>
+
+  <p class="tag">
+   NO ACCOUNT • NO DATABASE<br>
+   LOCAL PROGRESS SAVE
+  </p>
+ </div>
+</section>
+
+<section id="game">
+
+ <canvas id="cv"></canvas>
+
+ <div class="hud">
+  <span id="label">LEVEL 1</span>
+  <span>
+   DEATHS: <b id="deathHud">0</b>
+   TIME: <b id="timer">0</b>s
+  </span>
+ </div>
+
+ <div class="controls">
+  <div class="pad">
+   <button class="ctrl" id="left">◀</button>
+   <button class="ctrl" id="right">▶</button>
+  </div>
+  <button class="ctrl jump" id="jump">⬆</button>
+ </div>
+
+ <div id="toast">
+  <div class="box">
+   <h2 id="toastTitle"></h2>
+   <p id="toastText"></p>
+   <br>
+   <button id="toastBtn">NEXT</button>
+  </div>
+ </div>
+
+ <div id="levelSelect">
+  <h2>LEVEL SELECT</h2>
+  <p>Unlocked levels</p>
+  <div class="levelGrid" id="levelGrid"></div>
+  <br>
+  <button id="closeLevels">CLOSE</button>
+ </div>
+
+</section>
+
+</div>
+
+<script>
+(()=>{
+"use strict";
+
+const $=id=>document.getElementById(id);
+const cv=$("cv");
+const ctx=cv.getContext("2d");
+
+let level=Math.max(1,Math.min(100,Number(localStorage.rrLevel||1)));
+let best=Math.max(1,Number(localStorage.rrBest||1));
+let deaths=Number(localStorage.rrDeaths||0);
+
+let running=false;
+let dead=false;
+let won=false;
+
+let last=0;
+let startTime=0;
+let camera=0;
+let worldWidth=0;
+
+let player;
+let platforms=[];
+let traps=[];
+let coins=[];
+let particles=[];
+
+let keys={
+ left:false,
+ right:false,
+ jump:false
+};
+
+function clamp(n,min,max){
+ return Math.max(min,Math.min(max,n));
+}
+
+function random(min,max){
+ return min+Math.random()*(max-min);
+}
+
+function resizeCanvas(){
+ const rect=cv.getBoundingClientRect();
+
+ cv.width=Math.max(1,Math.floor(rect.width*devicePixelRatio));
+ cv.height=Math.max(1,Math.floor(rect.height*devicePixelRatio));
+
+ ctx.setTransform(
+  devicePixelRatio,0,0,
+  devicePixelRatio,0,0
+ );
+}
+
+new ResizeObserver(resizeCanvas).observe(cv);
+
+function updateStats(){
+ $("levelTop").textContent=level+"/100";
+ $("bestTop").textContent=best;
+ $("deathsTop").textContent=deaths;
+ $("deathHud").textContent=deaths;
+}
+
+function buildLevel(){
+ resizeCanvas();
+
+ const W=cv.clientWidth;
+ const H=cv.clientHeight;
+
+ platforms=[];
+ traps=[];
+ coins=[];
+ particles=[];
+
+ worldWidth=Math.max(1800,1200+level*25);
+
+ let baseY=H*.72;
+
+ platforms.push({
+  x:0,
+  y:baseY,
+  w:220,
+  h:24,
+  fake:false,
+  trigger:false,
+  timer:0
+ });
+
+ let x=260;
+
+ while(x<worldWidth-240){
+
+  const gap=clamp(
+   48+level*.9+random(0,20),
+   48,
+   155
+  );
+
+  const width=clamp(
+   145-level*.65+random(-10,15),
+   65,
+   150
+  );
+
+  baseY=clamp(
+   baseY+random(-100,100),
+   H*.34,
+   H*.80
+  );
+
+  platforms.push({
+   x:x,
+   y:baseY,
+   w:width,
+   h:22,
+   fake:Math.random()<Math.min(.4,.08+level*.003),
+   trigger:false,
+   timer:0
+  });
+
+  if(Math.random()<Math.min(.8,.3+level*.005)){
+   traps.push({
+    x:x+width/2,
+    y:baseY-20,
+    r:12+Math.min(10,level*.1),
+    phase:random(0,7),
+    range:25+Math.min(level,90),
+    type:"orb"
+   });
+  }
+
+  if(Math.random()<.55){
+   coins.push({
+    x:x+width/2,
+    y:baseY-43,
+    taken:false
+   });
+  }
+
+  x+=width+gap;
+ }
+
+ platforms.push({
+  x:worldWidth-180,
+  y:baseY-10,
+  w:180,
+  h:24,
+  fake:false
+ });
+
+ if(level%10===0){
+  traps.push({
+   x:worldWidth*.55,
+   y:H*.48,
+   r:32,
+   phase:0,
+   range:H*.17,
+   type:"boss"
+  });
+ }
+
+ player={
+  x:35,
+  y:H*.5,
+  vx:0,
+  vy:0,
+  w:27,
+  h:30,
+  onGround:false
+ };
+
+ $("label").textContent=
+  "LEVEL "+level+
+  (level%10===0?" • DEVIL BOSS":" • NO MERCY");
+}
+
+function showToast(title,message,button,action){
+ $("toastTitle").textContent=title;
+ $("toastText").textContent=message;
+ $("toastBtn").textContent=button;
+ $("toast").style.display="flex";
+ $("toastBtn").onclick=action;
+}
+
+function startGame(){
+ $("menu").style.display="none";
+ $("game").style.display="block";
+ $("levelSelect").style.display="none";
+ $("toast").style.display="none";
+
+ buildLevel();
+
+ running=true;
+ dead=false;
+ won=false;
+
+ startTime=performance.now();
+ last=startTime;
+
+ requestAnimationFrame(loop);
+}
+
+function die(){
+ if(dead||won)return;
+
+ dead=true;
+ running=false;
+
+ deaths++;
+ localStorage.rrDeaths=deaths;
+
+ updateStats();
+
+ showToast(
+  "YOU GOT COOKED!",
+  "The Devil is waiting. Learn the timing and try again.",
+  "RETRY",
+  startGame
+ );
+}
+
+function completeLevel(){
+ if(won)return;
+
+ won=true;
+ running=false;
+
+ if(level<100){
+  level++;
+ }
+
+ best=Math.max(best,level);
+
+ localStorage.rrLevel=level;
+ localStorage.rrBest=best;
+
+ updateStats();
+
+ showToast(
+  level===100?"DEVIL CONQUERED!":"LEVEL CLEARED!",
+  level===100?
+  "You conquered all 100 levels!":
+  "Next level is harder. Keep going.",
+  level===100?"PLAY AGAIN":"NEXT LEVEL",
+  ()=>{
+   if(level===100){
+    level=1;
+    localStorage.rrLevel=1;
+   }
+   startGame();
+  }
+ );
+}
+
+function bindControl(id,key){
+ const el=$(id);
+
+ el.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  keys[key]=true;
+ });
+
+ ["pointerup","pointercancel","pointerleave"].forEach(type=>{
+  el.addEventListener(type,e=>{
+   e.preventDefault();
+   keys[key]=false;
+  });
+ });
+}
+
+bindControl("left","left");
+bindControl("right","right");
+bindControl("jump","jump");
+
+window.addEventListener("keydown",e=>{
+ if(e.key==="ArrowLeft"||e.key.toLowerCase()==="a"){
+  keys.left=true;
+ }
+ if(e.key==="ArrowRight"||e.key.toLowerCase()==="d"){
+  keys.right=true;
+ }
+ if(e.key===" "||e.key==="ArrowUp"){
+  keys.jump=true;
+ }
+});
+
+window.addEventListener("keyup",e=>{
+ if(e.key==="ArrowLeft"||e.key.toLowerCase()==="a"){
+  keys.left=false;
+ }
+ if(e.key==="ArrowRight"||e.key.toLowerCase()==="d"){
+  keys.right=false;
+ }
+ if(e.key===" "||e.key==="ArrowUp"){
+  keys.jump=false;
+ }
+});
+
+function update(dt,time){
+
+ const p=player;
+
+ const speed=300+Math.min(80,level*.7);
+
+ p.vx=(keys.right?1:0)-(keys.left?1:0);
+ p.vx*=speed;
+
+ p.x+=p.vx*dt;
+
+ if(keys.jump&&p.onGround){
+  p.vy=-Math.max(540,650-level*.55);
+  p.onGround=false;
+ }
+
+ p.vy+=1700*dt;
+ p.y+=p.vy*dt;
+
+ p.onGround=false;
+
+ for(const platform of platforms){
+
+  if(platform.timer>0){
+   platform.timer-=dt;
+   if(platform.timer<=0){
+    platform.gone=true;
+   }
+  }
+
+  if(platform.gone)continue;
+
+  if(
+   p.vy>=0&&
+   p.x+p.w>platform.x&&
+   p.x<platform.x+platform.w&&
+   p.y+p.h>=platform.y&&
+   p.y+p.h-p.vy*dt<=platform.y+5
+  ){
+   p.y=platform.y-p.h;
+   p.vy=0;
+   p.onGround=true;
+
+   if(platform.fake&&!platform.timer){
+    platform.timer=.35;
+   }
+  }
+ }
+
+ p.x=clamp(p.x,0,worldWidth);
+
+ if(p.y>cv.clientHeight+80){
+  die();
+  return;
+ }
+
+ for(const trap of traps){
+
+  let tx=trap.x;
+  let ty=trap.y+Math.sin(time/450+trap.phase)*trap.range;
+
+  if(trap.type==="boss"){
+   tx=trap.x+Math.sin(time/600)*trap.range;
+   ty=trap.y+Math.cos(time/500)*trap.range;
+  }
+
+  const distance=Math.hypot(
+   p.x+p.w/2-tx,
+   p.y+p.h/2-ty
+  );
+
+  if(distance<trap.r+14){
+   die();
+   return;
+  }
+ }
+
+ for(const coin of coins){
+  if(!coin.taken){
+   const distance=Math.hypot(
+    p.x+p.w/2-coin.x,
+    p.y+10-coin.y
+   );
+
+   if(distance<22){
+    coin.taken=true;
+   }
+  }
+ }
+
+ const exitPlatform=platforms[platforms.length-1];
+
+ if(
+  p.x+p.w>worldWidth-145&&
+  p.y<exitPlatform.y+20
+ ){
+  completeLevel();
+  return;
+ }
+
+ camera=clamp(
+  p.x-cv.clientWidth*.32,
+  0,
+  worldWidth-cv.clientWidth
+ );
+}
+
+function drawBackground(W,H,time){
+
+ const gradient=ctx.createLinearGradient(0,0,0,H);
+
+ gradient.addColorStop(0,"#080d35");
+ gradient.addColorStop(.55,"#160b35");
+ gradient.addColorStop(1,"#3a071c");
+
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,W,H);
+
+ for(let i=0;i<85;i++){
+
+  let sx=(i*139-camera*.15)%W;
+
+  if(sx<0)sx+=W;
+
+  const sy=(i*71)%H;
+
+  ctx.globalAlpha=.2+(i%4)*.13;
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(sx,sy,2,2);
+ }
+
+ ctx.globalAlpha=1;
+
+ ctx.fillStyle="#5a174e";
+ ctx.globalAlpha=.3;
+ ctx.beginPath();
+ ctx.arc(W*.8,H*.25,70,0,Math.PI*2);
+ ctx.fill();
+ ctx.globalAlpha=1;
+}
+
+function drawPlatforms(){
+
+ for(const platform of platforms){
+
+  if(platform.gone)continue;
+
+  ctx.save();
+
+  ctx.shadowBlur=15;
+  ctx.shadowColor=platform.fake?"#ff168e":"#00eaff";
+
+  ctx.fillStyle=platform.fake?"#48103c":"#102b55";
+
+  ctx.fillRect(
+   platform.x,
+   platform.y,
+   platform.w,
+   platform.h
+  );
+
+  ctx.fillStyle=platform.fake?"#ff168e":"#00eaff";
+
+  ctx.fillRect(
+   platform.x,
+   platform.y,
+   platform.w,
+   4
+  );
+
+  ctx.shadowBlur=0;
+  ctx.strokeStyle="#708aff";
+
+  ctx.strokeRect(
+   platform.x,
+   platform.y,
+   platform.w,
+   platform.h
+  );
+
+  ctx.restore();
+ }
+}
+
+function drawTraps(time){
+
+ for(const trap of traps){
+
+  let tx=trap.x;
+  let ty=trap.y+Math.sin(time/450+trap.phase)*trap.range;
+
+  if(trap.type==="boss"){
+   tx=trap.x+Math.sin(time/600)*trap.range;
+   ty=trap.y+Math.cos(time/500)*trap.range;
+  }
+
+  ctx.save();
+  ctx.translate(tx,ty);
+
+  ctx.shadowBlur=20;
+  ctx.shadowColor="#ff168e";
+
+  ctx.fillStyle=trap.type==="boss"?"#ff168e":"#ff315b";
+
+  ctx.beginPath();
+  ctx.arc(0,0,trap.r,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.strokeStyle="#ffffff";
+  ctx.lineWidth=3;
+  ctx.stroke();
+
+  ctx.fillStyle="#ffffff";
+
+  ctx.beginPath();
+  ctx.arc(-trap.r*.3,-trap.r*.2,3,0,7);
+  ctx.arc(trap.r*.3,-trap.r*.2,3,0,7);
+  ctx.fill();
+
+  ctx.restore();
+ }
+}
+
+function drawCoins(time){
+
+ for(const coin of coins){
+
+  if(coin.taken)continue;
+
+  ctx.save();
+
+  ctx.shadowBlur=16;
+  ctx.shadowColor="#ffd52a";
+  ctx.fillStyle="#ffd52a";
+
+  ctx.beginPath();
+  ctx.arc(
+   coin.x,
+   coin.y,
+   8+Math.sin(time/100+coin.x)*2,
+   0,
+   Math.PI*2
+  );
+  ctx.fill();
+
+  ctx.restore();
+ }
+}
+
+function drawExit(){
+
+ const end=platforms[platforms.length-1];
+
+ ctx.save();
+
+ ctx.shadowBlur=22;
+ ctx.shadowColor="#ff168e";
+
+ ctx.fillStyle="#ffd52a";
+ ctx.fillRect(
+  worldWidth-145,
+  end.y-55,
+  10,
+  55
+ );
+
+ ctx.fillStyle="#ff168e";
+ ctx.fillRect(
+  worldWidth-135,
+  end.y-55,
+  38,
+  9
+ );
+
+ ctx.restore();
+}
+
+function drawPlayer(){
+
+ const p=player;
+
+ ctx.save();
+
+ ctx.shadowBlur=20;
+ ctx.shadowColor="#ff168e";
+
+ ctx.fillStyle="#ff168e";
+
+ ctx.fillRect(
+  p.x,
+  p.y,
+  p.w,
+  p.h
+ );
+
+ ctx.shadowBlur=0;
+
+ ctx.fillStyle="#ffffff";
+
+ ctx.fillRect(p.x+5,p.y+8,5,5);
+ ctx.fillRect(p.x+17,p.y+8,5,5);
+
+ ctx.fillStyle="#25051d";
+
+ ctx.fillRect(p.x+7,p.y+20,13,3);
+
+ ctx.restore();
+}
+
+function draw(time){
+
+ const W=cv.clientWidth;
+ const H=cv.clientHeight;
+
+ ctx.clearRect(0,0,W,H);
+
+ drawBackground(W,H,time);
+
+ ctx.save();
+ ctx.translate(-camera,0);
+
+ drawPlatforms();
+ drawTraps(time);
+ drawCoins(time);
+ drawExit();
+ drawPlayer();
+
+ ctx.restore();
+}
+
+function loop(time){
+
+ if(!running)return;
+
+ const dt=Math.min(.032,(time-last)/1000||.016);
+
+ last=time;
+
+ $("timer").textContent=
+  ((time-startTime)/1000).toFixed(1);
+
+ update(dt,time);
+
+ if(!running)return;
+
+ draw(time);
+
+ requestAnimationFrame(loop);
+}
+
+function showLevels(){
+
+ const grid=$("levelGrid");
+ grid.innerHTML="";
+
+ for(let i=1;i<=100;i++){
+
+  const btn=document.createElement("button");
+
+  btn.textContent=i;
+  btn.disabled=i>best;
+
+  if(i===level){
+   btn.style.borderColor="#ff168e";
+  }
+
+  btn.onclick=()=>{
+   if(i<=best){
+    level=i;
+    localStorage.rrLevel=level;
+    updateStats();
+    startGame();
+   }
+  };
+
+  grid.appendChild(btn);
+ }
+
+ $("menu").style.display="none";
+ $("game").style.display="block";
+ $("levelSelect").style.display="block";
+}
+
+$("play").onclick=startGame;
+
+$("levelsButton").onclick=showLevels;
+
+$("closeLevels").onclick=()=>{
+ $("levelSelect").style.display="none";
+ $("game").style.display="none";
+ $("menu").style.display="grid";
+};
+
+$("reset").onclick=()=>{
+
+ if(confirm("Reset all saved progress?")){
+
+  level=1;
+  best=1;
+  deaths=0;
+
+  localStorage.removeItem("rrLevel");
+  localStorage.removeItem("rrBest");
+  localStorage.removeItem("rrDeaths");
+
+  updateStats();
+ }
+};
+
+updateStats();
+
+})();
+</script>
+
+</body>
+</html>
